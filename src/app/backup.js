@@ -114,14 +114,65 @@ Passengers: ${booking.passengers}`;
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>{type} Location</Label>
-        <Input
-          placeholder={`Enter ${type.toLowerCase()} location`}
-          name={type.toLowerCase()}
-          value={value}
-          onChange={onChange}
-          className={`mb-2 ${error ? 'border-red-500' : ''}`}
-        />
+        <RadioGroup
+          defaultValue="text"
+          value={booking[`${type.toLowerCase()}Method`]}
+          onValueChange={(value) => handleLocationMethodChange(value, type.toLowerCase())}
+          className="flex space-x-4 mb-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="text" id={`${type}-text`} />
+            <Label htmlFor={`${type}-text`} className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Text Input
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="map" id={`${type}-map`} />
+            <Label htmlFor={`${type}-map`} className="flex items-center gap-2">
+              <Navigation className="h-4 w-4" />
+              Map Selection
+            </Label>
+          </div>
+        </RadioGroup>
       </div>
+
+      {booking[`${type.toLowerCase()}Method`] === "text" ? (
+        <div>
+          <Input
+            placeholder={`Enter ${type.toLowerCase()} location`}
+            name={type.toLowerCase()}
+            value={value}
+            onChange={onChange}
+            className={`mb-2 ${error ? 'border-red-500' : ''}`}
+          />
+          {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="relative w-full h-96 bg-gray-100 rounded-lg">
+            <iframe
+              className="w-full h-full rounded-lg"
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=29.7500,-2.6167,30.1344,-1.9428&layer=mapnik&marker=${
+                type === "Pickup" ? "-1.9567,30.0964" : ""
+              }`}
+              style={{ border: "1px solid #ddd" }}
+            />
+          </div>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => handleMapSelection(type.toLowerCase())}
+          >
+            Confirm Location
+          </Button>
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 
