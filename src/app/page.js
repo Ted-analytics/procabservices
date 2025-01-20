@@ -1,12 +1,9 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Phone, MessageSquare, Clock, MapPin, Navigation, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Phone, MessageSquare, Clock, MapPin, AlertCircle } from "lucide-react";
+
+// Styling utility function
+const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 const CabServiceWebsite = () => {
   const [booking, setBooking] = useState({
@@ -17,9 +14,7 @@ const CabServiceWebsite = () => {
     date: "",
     time: "",
     passengers: "",
-    service: "City Ride (Kigali)", // Default service type
-    pickupMethod: "text",
-    destinationMethod: "text"
+    service: "City Ride (Kigali)"
   });
 
   const [validation, setValidation] = useState({
@@ -75,23 +70,6 @@ const CabServiceWebsite = () => {
     }));
   };
 
-  const handleLocationMethodChange = (value, type) => {
-    setBooking(prev => ({
-      ...prev,
-      [`${type}Method`]: value,
-      [type]: "" // Reset the location value when switching methods
-    }));
-  };
-
-  const handleMapSelection = (type) => {
-    // In a real implementation, you would get the coordinates from the map click
-    const locationLabel = `Selected location from map (${type})`;
-    setBooking(prev => ({
-      ...prev,
-      [type]: locationLabel
-    }));
-  };
-
   const handleWhatsAppRedirect = () => {
     if (!validation.isValid) {
       return;
@@ -110,21 +88,6 @@ Passengers: ${booking.passengers}`;
     window.open(`https://wa.me/250787721374?text=${encodeURIComponent(message)}`);
   };
 
-  const LocationInput = ({ type, value, onChange, error }) => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>{type} Location</Label>
-        <Input
-          placeholder={`Enter ${type.toLowerCase()} location`}
-          name={type.toLowerCase()}
-          value={value}
-          onChange={onChange}
-          className={`mb-2 ${error ? 'border-red-500' : ''}`}
-        />
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -138,176 +101,205 @@ Passengers: ${booking.passengers}`;
       {/* Main Content */}
       <div className="max-w-4xl mx-auto py-12 px-4">
         {/* Rates Section */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-6 w-6" />
-              Our Services & Rates
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(rates).map(([service, details]) => (
-                <div
-                  key={service}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-                    booking.service === service ? 'border-blue-500 bg-blue-50' : 'hover:border-blue-200'
-                  }`}
-                  onClick={() => handleBookingChange({ target: { name: 'service', value: service } })}
-                >
-                  <h3 className="font-semibold">{service}</h3>
-                  <p className="text-lg text-blue-600">{details.price}</p>
-                  <p className="text-sm text-gray-600 mt-2">{details.description}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-lg shadow-md mb-12 p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Clock className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">Our Services & Rates</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(rates).map(([service, details]) => (
+              <div
+                key={service}
+                className={cn(
+                  'p-4 border rounded-lg cursor-pointer transition-all duration-200',
+                  booking.service === service ? 'border-blue-500 bg-blue-50' : 'hover:border-blue-200'
+                )}
+                onClick={() => handleBookingChange({ target: { name: 'service', value: service } })}
+              >
+                <h3 className="font-semibold">{service}</h3>
+                <p className="text-lg text-blue-600">{details.price}</p>
+                <p className="text-sm text-gray-600 mt-2">{details.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Booking Form */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-6 w-6" />
-              Book a Ride
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Input
-                    placeholder="Your Name"
-                    name="name"
-                    value={booking.name}
-                    onChange={handleBookingChange}
-                    className={validation.errors.name ? 'border-red-500' : ''}
-                  />
-                  {validation.errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{validation.errors.name}</p>
+        <div className="bg-white rounded-lg shadow-md mb-12 p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <MapPin className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">Book a Ride</h2>
+          </div>
+          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  name="name"
+                  value={booking.name}
+                  onChange={handleBookingChange}
+                  className={cn(
+                    'w-full px-4 py-2 border rounded-md',
+                    validation.errors.name ? 'border-red-500' : 'border-gray-300'
                   )}
-                </div>
-                <div>
-                  <Input
-                    placeholder="Phone Number"
-                    name="phone"
-                    value={booking.phone}
-                    onChange={handleBookingChange}
-                    className={validation.errors.phone ? 'border-red-500' : ''}
-                  />
-                  {validation.errors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{validation.errors.phone}</p>
-                  )}
-                </div>
+                />
+                {validation.errors.name && (
+                  <p className="text-red-500 text-sm mt-1">{validation.errors.name}</p>
+                )}
               </div>
-
-              <LocationInput
-                type="Pickup"
-                value={booking.pickup}
-                onChange={handleBookingChange}
-                error={validation.errors.pickup}
-              />
-
-              <LocationInput
-                type="Destination"
-                value={booking.destination}
-                onChange={handleBookingChange}
-                error={validation.errors.destination}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Input
-                    type="date"
-                    name="date"
-                    value={booking.date}
-                    onChange={handleBookingChange}
-                    className={validation.errors.date ? 'border-red-500' : ''}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                  {validation.errors.date && (
-                    <p className="text-red-500 text-sm mt-1">{validation.errors.date}</p>
+              <div>
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  name="phone"
+                  value={booking.phone}
+                  onChange={handleBookingChange}
+                  className={cn(
+                    'w-full px-4 py-2 border rounded-md',
+                    validation.errors.phone ? 'border-red-500' : 'border-gray-300'
                   )}
-                </div>
-                <div>
-                  <Input
-                    type="time"
-                    name="time"
-                    value={booking.time}
-                    onChange={handleBookingChange}
-                    className={validation.errors.time ? 'border-red-500' : ''}
-                  />
-                  {validation.errors.time && (
-                    <p className="text-red-500 text-sm mt-1">{validation.errors.time}</p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    placeholder="Number of Passengers"
-                    name="passengers"
-                    type="number"
-                    min="1"
-                    value={booking.passengers}
-                    onChange={handleBookingChange}
-                    className={validation.errors.passengers ? 'border-red-500' : ''}
-                  />
-                  {validation.errors.passengers && (
-                    <p className="text-red-500 text-sm mt-1">{validation.errors.passengers}</p>
-                  )}
-                </div>
-              </div>
-
-              {!validation.isValid && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Please fill in all required fields correctly before proceeding.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <Button
-                className={`w-full ${validation.isValid ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400'}`}
-                onClick={handleWhatsAppRedirect}
-                disabled={!validation.isValid}
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Book via WhatsApp
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Contact Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-6 w-6" />
-              Contact Us
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center">
-              <p className="text-xl mb-4">Available 24/7 for your convenience</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  className="bg-green-500 hover:bg-green-600"
-                  onClick={() => window.open('https://wa.me/250787721374')}
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Chat on WhatsApp
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => window.location.href = 'tel:+250787721374'}
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call +250 787 721 374
-                </Button>
+                />
+                {validation.errors.phone && (
+                  <p className="text-red-500 text-sm mt-1">{validation.errors.phone}</p>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <input
+                type="text"
+                placeholder="Pickup Location"
+                name="pickup"
+                value={booking.pickup}
+                onChange={handleBookingChange}
+                className={cn(
+                  'w-full px-4 py-2 border rounded-md',
+                  validation.errors.pickup ? 'border-red-500' : 'border-gray-300'
+                )}
+              />
+              {validation.errors.pickup && (
+                <p className="text-red-500 text-sm mt-1">{validation.errors.pickup}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="text"
+                placeholder="Destination"
+                name="destination"
+                value={booking.destination}
+                onChange={handleBookingChange}
+                className={cn(
+                  'w-full px-4 py-2 border rounded-md',
+                  validation.errors.destination ? 'border-red-500' : 'border-gray-300'
+                )}
+              />
+              {validation.errors.destination && (
+                <p className="text-red-500 text-sm mt-1">{validation.errors.destination}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <input
+                  type="date"
+                  name="date"
+                  value={booking.date}
+                  onChange={handleBookingChange}
+                  className={cn(
+                    'w-full px-4 py-2 border rounded-md',
+                    validation.errors.date ? 'border-red-500' : 'border-gray-300'
+                  )}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+                {validation.errors.date && (
+                  <p className="text-red-500 text-sm mt-1">{validation.errors.date}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="time"
+                  name="time"
+                  value={booking.time}
+                  onChange={handleBookingChange}
+                  className={cn(
+                    'w-full px-4 py-2 border rounded-md',
+                    validation.errors.time ? 'border-red-500' : 'border-gray-300'
+                  )}
+                />
+                {validation.errors.time && (
+                  <p className="text-red-500 text-sm mt-1">{validation.errors.time}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="number"
+                  placeholder="Number of Passengers"
+                  name="passengers"
+                  min="1"
+                  value={booking.passengers}
+                  onChange={handleBookingChange}
+                  className={cn(
+                    'w-full px-4 py-2 border rounded-md',
+                    validation.errors.passengers ? 'border-red-500' : 'border-gray-300'
+                  )}
+                />
+                {validation.errors.passengers && (
+                  <p className="text-red-500 text-sm mt-1">{validation.errors.passengers}</p>
+                )}
+              </div>
+            </div>
+
+            {!validation.isValid && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 mr-2" />
+                  <p>Please fill in all required fields correctly before proceeding.</p>
+                </div>
+              </div>
+            )}
+
+            <button
+              className={cn(
+                'w-full px-4 py-2 rounded-md text-white flex items-center justify-center',
+                validation.isValid ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400'
+              )}
+              onClick={handleWhatsAppRedirect}
+              disabled={!validation.isValid}
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Book via WhatsApp
+            </button>
+          </form>
+        </div>
+
+        {/* Contact Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Phone className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">Contact Us</h2>
+          </div>
+          <div className="text-center">
+            <p className="text-xl mb-4">Available 24/7 for your convenience</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center justify-center"
+                onClick={() => window.open('https://wa.me/250787721374')}
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Chat on WhatsApp
+              </button>
+              <button
+                className="border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-md flex items-center justify-center"
+                onClick={() => window.location.href = 'tel:+250787721374'}
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                Call +250 787 721 374
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

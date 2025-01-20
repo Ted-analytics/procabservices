@@ -5,12 +5,12 @@
   "homepage": "https://github.com/Ted-analytics/procabservices",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "init-shadcn": "shadcn-ui init",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "next build && touch out/.nojekyll && gh-pages -d out --dotfiles",
+    "build": "next build"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.1",
